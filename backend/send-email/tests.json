@@ -1,0 +1,38 @@
+{
+  "tests": [
+    {
+      "name": "Submit contact form successfully",
+      "method": "POST",
+      "body": {
+        "name": "Иван Иванов",
+        "email": "ivan@example.com",
+        "phone": "+7 999 123-45-67",
+        "message": "Хочу обсудить проект"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true,
+        "message": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Handle OPTIONS request",
+      "method": "OPTIONS",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Reject incomplete form",
+      "method": "POST",
+      "body": {
+        "name": "Иван",
+        "email": "ivan@example.com"
+      },
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

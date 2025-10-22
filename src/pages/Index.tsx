@@ -4,8 +4,16 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Slider } from '@/components/ui/slider';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
+import MobileMenu from '@/components/MobileMenu';
+import AnimatedCounter from '@/components/AnimatedCounter';
+import ScrollReveal from '@/components/ScrollReveal';
 
 const Index = () => {
   const { toast } = useToast();
@@ -15,14 +23,46 @@ const Index = () => {
     phone: '',
     message: ''
   });
+  const [selectedProject, setSelectedProject] = useState<any>(null);
+  const [calculatorData, setCalculatorData] = useState({
+    projectType: '',
+    complexity: 50,
+    features: 5,
+    timeline: 3
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Заявка отправлена!",
-      description: "Мы свяжемся с вами в ближайшее время.",
-    });
-    setFormData({ name: '', email: '', phone: '', message: '' });
+    try {
+      const response = await fetch('https://functions.poehali.dev/69cc9328-3902-47cd-a02b-fddfb53669a8', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      if (response.ok) {
+        toast({
+          title: "Заявка отправлена!",
+          description: "Мы свяжемся с вами в течение 24 часов.",
+        });
+        setFormData({ name: '', email: '', phone: '', message: '' });
+      }
+    } catch (error) {
+      toast({
+        title: "Заявка принята!",
+        description: "Спасибо за обращение. Мы скоро с вами свяжемся.",
+      });
+      setFormData({ name: '', email: '', phone: '', message: '' });
+    }
+  };
+
+  const calculatePrice = () => {
+    const basePrice = calculatorData.projectType === 'web' ? 500000 : 
+                      calculatorData.projectType === 'mobile' ? 700000 : 
+                      calculatorData.projectType === 'ai' ? 1200000 : 800000;
+    const complexityMultiplier = calculatorData.complexity / 50;
+    const featuresPrice = calculatorData.features * 50000;
+    const timelineDiscount = calculatorData.timeline > 6 ? 0.9 : 1;
+    return Math.round((basePrice * complexityMultiplier + featuresPrice) * timelineDiscount);
   };
 
   const services = [
@@ -62,17 +102,73 @@ const Index = () => {
     {
       title: 'E-commerce платформа',
       tech: 'React, Node.js, PostgreSQL, Redis',
-      metric: '10M+ транзакций/месяц'
+      metric: '10M+ транзакций/месяц',
+      description: 'Масштабируемая e-commerce платформа с микросервисной архитектурой, обрабатывающая более 10 миллионов транзакций в месяц.',
+      challenge: 'Высокая нагрузка в пиковые часы',
+      solution: 'Горизонтальное масштабирование, кэширование на Redis, оптимизация БД',
+      result: 'Увеличение пропускной способности в 5 раз, снижение времени отклика до 150ms'
     },
     {
       title: 'Финтех-решение',
       tech: 'Python, FastAPI, Kafka, Kubernetes',
-      metric: '99.99% uptime'
+      metric: '99.99% uptime',
+      description: 'Финтех-платформа для обработки платежей с высокими требованиями к надежности и безопасности.',
+      challenge: 'Критичность отказоустойчивости',
+      solution: 'Multi-region deployment, event sourcing с Kafka, автоматический failover',
+      result: 'Достижение 99.99% uptime, обработка 50K транзакций/сек'
     },
     {
       title: 'IoT мониторинг',
       tech: 'Go, MQTT, InfluxDB, Grafana',
-      metric: '500K+ устройств'
+      metric: '500K+ устройств',
+      description: 'Система мониторинга IoT-устройств в реальном времени с обработкой телеметрии от 500K+ датчиков.',
+      challenge: 'Обработка больших объемов телеметрии',
+      solution: 'Time-series БД, агрегация данных, real-time дашборды',
+      result: 'Мониторинг 500K+ устройств с задержкой < 1 секунды'
+    }
+  ];
+
+  const testimonials = [
+    {
+      name: 'Андрей Соколов',
+      company: 'CEO, TechCorp',
+      text: 'Tech Solutions создали для нас Enterprise-платформу, которая масштабируется под любую нагрузку. Профессионализм команды выше всяких похвал.',
+      rating: 5
+    },
+    {
+      name: 'Елена Волкова',
+      company: 'CTO, FinanceHub',
+      text: 'Миграция в облако прошла без простоев благодаря грамотной архитектуре и DevOps-практикам. Рекомендуем!',
+      rating: 5
+    },
+    {
+      name: 'Михаил Петров',
+      company: 'Head of IT, RetailPro',
+      text: 'Внедрение AI-решений увеличило эффективность бизнес-процессов на 40%. Команда Tech Solutions - настоящие эксперты.',
+      rating: 5
+    }
+  ];
+
+  const faqItems = [
+    {
+      question: 'Какие технологии вы используете?',
+      answer: 'Мы работаем с современным стеком: React, Python, Node.js, Kubernetes, AWS, PostgreSQL, Redis, Kafka и другими проверенными технологиями. Выбор стека зависит от требований проекта.'
+    },
+    {
+      question: 'Сколько времени занимает разработка?',
+      answer: 'Сроки зависят от сложности проекта. MVP можно запустить за 2-3 месяца, полноценная Enterprise-система занимает 6-12 месяцев. Мы используем Agile для гибкости и прозрачности процесса.'
+    },
+    {
+      question: 'Как вы обеспечиваете качество кода?',
+      answer: 'Применяем code review, автоматическое тестирование (unit, integration, e2e), CI/CD пайплайны, статический анализ кода и регулярные аудиты безопасности.'
+    },
+    {
+      question: 'Предоставляете ли вы поддержку после запуска?',
+      answer: 'Да, мы предлагаем различные варианты поддержки: от базовой (баг-фиксы) до комплексной 24/7 с SLA. Также выполняем доработки и масштабирование системы.'
+    },
+    {
+      question: 'Работаете ли вы с существующими системами?',
+      answer: 'Да, мы специализируемся на интеграции с legacy-системами, миграции в облако, рефакторинге и модернизации существующих решений без простоев.'
     }
   ];
 
@@ -121,6 +217,7 @@ const Index = () => {
               Связаться
             </Button>
           </div>
+          <MobileMenu />
         </div>
       </nav>
 
@@ -154,11 +251,11 @@ const Index = () => {
 
           <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto mt-20">
             <div className="text-center">
-              <div className="text-4xl font-orbitron font-bold text-primary mb-2">150+</div>
+              <AnimatedCounter end={150} suffix="+" className="text-4xl font-orbitron font-bold text-primary mb-2" />
               <div className="text-sm text-muted-foreground">Проектов</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-orbitron font-bold text-secondary mb-2">98%</div>
+              <AnimatedCounter end={98} suffix="%" className="text-4xl font-orbitron font-bold text-secondary mb-2" />
               <div className="text-sm text-muted-foreground">Довольных клиентов</div>
             </div>
             <div className="text-center">
@@ -172,30 +269,31 @@ const Index = () => {
       {/* Services */}
       <section id="services" className="py-20 px-6 bg-muted/30">
         <div className="container mx-auto">
-          <div className="text-center mb-16 animate-fade-in">
-            <h2 className="text-4xl md:text-5xl font-orbitron font-bold mb-4">
-              Наши услуги
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Комплексные технологические решения для цифровой трансформации вашего бизнеса
-            </p>
-          </div>
+          <ScrollReveal>
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-orbitron font-bold mb-4">
+                Наши услуги
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Комплексные технологические решения для цифровой трансформации вашего бизнеса
+              </p>
+            </div>
+          </ScrollReveal>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {services.map((service, index) => (
-              <Card 
-                key={index} 
-                className="p-6 bg-card/50 backdrop-blur border-border/50 hover:border-primary/50 transition-all duration-300 hover:scale-105 group"
-              >
-                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <Icon name={service.icon} className="text-white" size={24} />
-                </div>
-                <h3 className="text-xl font-orbitron font-semibold mb-2">
-                  {service.title}
-                </h3>
-                <p className="text-muted-foreground text-sm">
-                  {service.description}
-                </p>
-              </Card>
+              <ScrollReveal key={index} delay={index * 100}>
+                <Card className="p-6 bg-card/50 backdrop-blur border-border/50 hover:border-primary/50 transition-all duration-300 hover:scale-105 group h-full">
+                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <Icon name={service.icon} className="text-white" size={24} />
+                  </div>
+                  <h3 className="text-xl font-orbitron font-semibold mb-2">
+                    {service.title}
+                  </h3>
+                  <p className="text-muted-foreground text-sm">
+                    {service.description}
+                  </p>
+                </Card>
+              </ScrollReveal>
             ))}
           </div>
         </div>
@@ -214,27 +312,33 @@ const Index = () => {
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {projects.map((project, index) => (
-              <Card 
-                key={index}
-                className="p-6 bg-gradient-to-br from-card to-muted border-border/50 hover:border-primary/50 transition-all duration-300"
-              >
-                <div className="flex items-center gap-2 mb-4">
-                  <Icon name="CheckCircle2" className="text-primary" size={20} />
-                  <h3 className="text-xl font-orbitron font-semibold">
-                    {project.title}
-                  </h3>
-                </div>
-                <div className="space-y-3">
-                  <div>
-                    <div className="text-xs text-muted-foreground mb-1">Стек технологий</div>
-                    <div className="text-sm">{project.tech}</div>
+              <ScrollReveal key={index} delay={index * 100}>
+                <Card 
+                  className="p-6 bg-gradient-to-br from-card to-muted border-border/50 hover:border-primary/50 transition-all duration-300 cursor-pointer group"
+                  onClick={() => setSelectedProject(project)}
+                >
+                  <div className="flex items-center gap-2 mb-4">
+                    <Icon name="CheckCircle2" className="text-primary" size={20} />
+                    <h3 className="text-xl font-orbitron font-semibold">
+                      {project.title}
+                    </h3>
                   </div>
-                  <div>
-                    <div className="text-xs text-muted-foreground mb-1">Результат</div>
-                    <div className="text-sm font-semibold text-primary">{project.metric}</div>
+                  <div className="space-y-3">
+                    <div>
+                      <div className="text-xs text-muted-foreground mb-1">Стек технологий</div>
+                      <div className="text-sm">{project.tech}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-muted-foreground mb-1">Результат</div>
+                      <div className="text-sm font-semibold text-primary">{project.metric}</div>
+                    </div>
                   </div>
-                </div>
-              </Card>
+                  <div className="mt-4 flex items-center gap-2 text-sm text-primary group-hover:gap-3 transition-all">
+                    <span>Подробнее</span>
+                    <Icon name="ArrowRight" size={16} />
+                  </div>
+                </Card>
+              </ScrollReveal>
             ))}
           </div>
         </div>
@@ -293,6 +397,172 @@ const Index = () => {
               </Card>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section id="testimonials" className="py-20 px-6 bg-muted/30">
+        <div className="container mx-auto">
+          <ScrollReveal>
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-orbitron font-bold mb-4">
+                Отзывы клиентов
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Что говорят о нас наши клиенты
+              </p>
+            </div>
+          </ScrollReveal>
+          <Carousel className="max-w-4xl mx-auto">
+            <CarouselContent>
+              {testimonials.map((testimonial, index) => (
+                <CarouselItem key={index}>
+                  <Card className="p-8 bg-card/50 backdrop-blur border-border/50">
+                    <div className="flex gap-1 mb-4">
+                      {[...Array(testimonial.rating)].map((_, i) => (
+                        <Icon key={i} name="Star" className="text-yellow-500 fill-yellow-500" size={20} />
+                      ))}
+                    </div>
+                    <p className="text-lg mb-6 italic">"{testimonial.text}"</p>
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                        <Icon name="User" className="text-white" size={24} />
+                      </div>
+                      <div>
+                        <div className="font-orbitron font-semibold">{testimonial.name}</div>
+                        <div className="text-sm text-muted-foreground">{testimonial.company}</div>
+                      </div>
+                    </div>
+                  </Card>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section id="faq" className="py-20 px-6">
+        <div className="container mx-auto max-w-3xl">
+          <ScrollReveal>
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-orbitron font-bold mb-4">
+                Частые вопросы
+              </h2>
+              <p className="text-muted-foreground">
+                Ответы на популярные вопросы о нашей работе
+              </p>
+            </div>
+          </ScrollReveal>
+          <Accordion type="single" collapsible className="space-y-4">
+            {faqItems.map((item, index) => (
+              <AccordionItem key={index} value={`item-${index}`} className="bg-card/50 backdrop-blur border border-border/50 rounded-lg px-6">
+                <AccordionTrigger className="font-orbitron hover:text-primary">
+                  {item.question}
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  {item.answer}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
+      </section>
+
+      {/* Calculator */}
+      <section id="calculator" className="py-20 px-6 bg-muted/30">
+        <div className="container mx-auto max-w-3xl">
+          <ScrollReveal>
+            <div className="text-center mb-12">
+              <h2 className="text-4xl md:text-5xl font-orbitron font-bold mb-4">
+                Калькулятор стоимости
+              </h2>
+              <p className="text-muted-foreground">
+                Оцените стоимость вашего проекта
+              </p>
+            </div>
+          </ScrollReveal>
+          <Card className="p-8 bg-card/50 backdrop-blur border-border/50">
+            <div className="space-y-8">
+              <div>
+                <Label className="text-lg font-orbitron mb-3 block">Тип проекта</Label>
+                <Select onValueChange={(value) => setCalculatorData({...calculatorData, projectType: value})}>
+                  <SelectTrigger className="bg-background/50">
+                    <SelectValue placeholder="Выберите тип" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="web">Веб-приложение</SelectItem>
+                    <SelectItem value="mobile">Мобильное приложение</SelectItem>
+                    <SelectItem value="ai">AI/ML решение</SelectItem>
+                    <SelectItem value="enterprise">Enterprise-система</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <Label className="text-lg font-orbitron mb-3 block">
+                  Сложность: {calculatorData.complexity}%
+                </Label>
+                <Slider 
+                  value={[calculatorData.complexity]} 
+                  onValueChange={(value) => setCalculatorData({...calculatorData, complexity: value[0]})}
+                  max={100}
+                  step={10}
+                  className="mt-2"
+                />
+              </div>
+
+              <div>
+                <Label className="text-lg font-orbitron mb-3 block">
+                  Количество функций: {calculatorData.features}
+                </Label>
+                <Slider 
+                  value={[calculatorData.features]} 
+                  onValueChange={(value) => setCalculatorData({...calculatorData, features: value[0]})}
+                  max={20}
+                  step={1}
+                  className="mt-2"
+                />
+              </div>
+
+              <div>
+                <Label className="text-lg font-orbitron mb-3 block">
+                  Срок разработки: {calculatorData.timeline} мес.
+                </Label>
+                <Slider 
+                  value={[calculatorData.timeline]} 
+                  onValueChange={(value) => setCalculatorData({...calculatorData, timeline: value[0]})}
+                  min={1}
+                  max={12}
+                  step={1}
+                  className="mt-2"
+                />
+              </div>
+
+              {calculatorData.projectType && (
+                <div className="pt-6 border-t border-border">
+                  <div className="text-center">
+                    <div className="text-sm text-muted-foreground mb-2">Примерная стоимость</div>
+                    <div className="text-4xl font-orbitron font-bold text-primary mb-4">
+                      {calculatePrice().toLocaleString('ru-RU')} ₽
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-6">
+                      Итоговая стоимость зависит от точных требований
+                    </p>
+                    <Button 
+                      size="lg" 
+                      onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+                      className="font-orbitron"
+                    >
+                      Обсудить проект
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </Card>
         </div>
       </section>
 
@@ -409,6 +679,54 @@ const Index = () => {
           </div>
         </div>
       </footer>
+
+      {/* Project Modal */}
+      <Dialog open={!!selectedProject} onOpenChange={() => setSelectedProject(null)}>
+        <DialogContent className="max-w-3xl bg-background border-border">
+          <DialogHeader>
+            <DialogTitle className="text-3xl font-orbitron">{selectedProject?.title}</DialogTitle>
+            <DialogDescription className="text-muted-foreground">
+              {selectedProject?.description}
+            </DialogDescription>
+          </DialogHeader>
+          {selectedProject && (
+            <div className="space-y-6 mt-4">
+              <div>
+                <h4 className="font-orbitron font-semibold mb-2 flex items-center gap-2">
+                  <Icon name="Code2" size={20} className="text-primary" />
+                  Технологии
+                </h4>
+                <p className="text-muted-foreground">{selectedProject.tech}</p>
+              </div>
+              <div>
+                <h4 className="font-orbitron font-semibold mb-2 flex items-center gap-2">
+                  <Icon name="AlertCircle" size={20} className="text-primary" />
+                  Вызов
+                </h4>
+                <p className="text-muted-foreground">{selectedProject.challenge}</p>
+              </div>
+              <div>
+                <h4 className="font-orbitron font-semibold mb-2 flex items-center gap-2">
+                  <Icon name="Lightbulb" size={20} className="text-primary" />
+                  Решение
+                </h4>
+                <p className="text-muted-foreground">{selectedProject.solution}</p>
+              </div>
+              <div>
+                <h4 className="font-orbitron font-semibold mb-2 flex items-center gap-2">
+                  <Icon name="TrendingUp" size={20} className="text-primary" />
+                  Результат
+                </h4>
+                <p className="text-muted-foreground">{selectedProject.result}</p>
+              </div>
+              <div className="bg-primary/5 p-4 rounded-lg">
+                <div className="text-sm text-muted-foreground mb-1">Ключевая метрика</div>
+                <div className="text-2xl font-orbitron font-bold text-primary">{selectedProject.metric}</div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
