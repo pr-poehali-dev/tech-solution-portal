@@ -132,7 +132,7 @@ const Index = () => {
     {
       name: 'Андрей Соколов',
       company: 'CEO, TechCorp',
-      text: 'Tech Solutions создали для нас Enterprise-платформу, которая масштабируется под любую нагрузку. Профессионализм команды выше всяких похвал.',
+      text: 'FlowClick создали для нас Enterprise-платформу, которая масштабируется под любую нагрузку. Профессионализм команды выше всяких похвал.',
       rating: 5
     },
     {
@@ -144,7 +144,7 @@ const Index = () => {
     {
       name: 'Михаил Петров',
       company: 'Head of IT, RetailPro',
-      text: 'Внедрение AI-решений увеличило эффективность бизнес-процессов на 40%. Команда Tech Solutions - настоящие эксперты.',
+      text: 'Внедрение AI-решений увеличило эффективность бизнес-процессов на 40%. Команда FlowClick - настоящие эксперты.',
       rating: 5
     }
   ];
@@ -205,7 +205,7 @@ const Index = () => {
       <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-lg border-b border-border">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="text-2xl font-orbitron font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            TECH SOLUTIONS
+            FLOWCLICK
           </div>
           <div className="hidden md:flex gap-8 items-center">
             <a href="#home" className="hover:text-primary transition-colors">Главная</a>
